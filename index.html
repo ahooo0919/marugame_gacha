@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>丸亀製麺 1000円ガチャ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Shippori+Mincho:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --wood-dark: #4a2e1b;
+            --wood-mid: #7a4b2a;
+            --wood-light: #c89666;
+            --wood-tray: #d8a673;
+            --noren-navy: #1c2a44;
+            --accent-red: #c83228;
+            --paper-bg: #f7f4ec;
+        }
+
+      
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: var(--paper-bg);
+            background-image: 
+                radial-gradient(#e5dec9 1px, transparent 1px),
+                radial-gradient(#e5dec9 1px, var(--paper-bg) 1px);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+            color: #2c241e;
+            overflow-x: hidden;
+        }
+
+        .font-mincho {
+            font-family: 'Shippori Mincho', serif;
+        }
+
+        /* 暖簾（のれん）デザイン */
+        .noren-container {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            filter: drop-shadow(0 6px 6px rgba(0,0,0,0.25));
+        }
+
+        .noren-flap {
+            background: linear-gradient(180deg, #162238 0%, #243656 100%);
+            border-bottom: 3px solid #d4af37;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .noren-flap:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 木製お盆（トレイ）スタイル */
+        .wooden-tray {
+            background: linear-gradient(135deg, #d7a574 0%, #c18a55 50%, #b27a45 100%);
+            border: 8px solid #8a5629;
+            border-radius: 18px;
+            box-shadow: 
+                inset 0 2px 10px rgba(255, 255, 255, 0.35),
+                inset 0 -4px 12px rgba(60, 30, 10, 0.45),
+                0 12px 24px rgba(45, 25, 10, 0.25);
+            position: relative;
+        }
+
+        .wooden-tray::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 10px;
+            background-image: repeating-linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.03) 0px,
+                rgba(255, 255, 255, 0.03) 2px,
+                rgba(74, 46, 27, 0.04) 2px,
+                rgba(74, 46, 27, 0.04) 6px
+            );
+            pointer-events: none;
+        }
+
+        /* 和紙カード */
+        .washi-card {
+            background-color: #fffdf9;
+            border: 1px solid #e2d8c3;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .washi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
+        }
+
+        /* ガチャボタン */
+        .gacha-btn {
+            background: linear-gradient(180deg, #d9382e 0%, #a82018 100%);
+            border: 2px solid #f7d08a;
+            box-shadow: 0 6px 0 #6e120d, 0 10px 20px rgba(168, 32, 24, 0.35);
+            transition: all 0.12s ease;
+        }
+
+        .gacha-btn:hover:not(:disabled) {
+            filter: brightness(1.06);
+            transform: translateY(-1px);
+            box-shadow: 0 7px 0 #6e120d, 0 12px 22px rgba(168, 32, 24, 0.4);
+        }
+
+        .gacha-btn:active:not(:disabled) {
+            transform: translateY(5px);
+            box-shadow: 0 1px 0 #6e120d, 0 4px 8px rgba(168, 32, 24, 0.3);
+        }
+
+        .gacha-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* アニメーション */
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.7) translateY(15px) rotate(-3deg);
+            }
+            70% {
+                transform: scale(1.04) translateY(-2px) rotate(1deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0) rotate(0deg);
+            }
+        }
+
+        .animate-pop-in {
+            animation: popIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes shakeBowl {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            20% { transform: rotate(-12deg) scale(1.08); }
+            40% { transform: rotate(12deg) scale(1.08); }
+            60% { transform: rotate(-8deg) scale(1.05); }
+            80% { transform: rotate(8deg) scale(1.05); }
+        }
+
+        .animate-shake {
+            animation: shakeBowl 0.45s ease-in-out infinite;
+        }
+
+        @keyframes stampDrop {
+            0% {
+                opacity: 0;
+                transform: scale(2.2) rotate(-12deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(-4deg);
+            }
+        }
+
+        .stamp-badge {
+            animation: stampDrop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            border: 3px solid #c83228;
+            color: #c83228;
+            background: rgba(255, 253, 249, 0.94);
+            box-shadow: 0 2px 6px rgba(200, 50, 40, 0.2);
+        }
+
+        /* スクロールバー調整 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #efeae0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c2b39b;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between pb-10">
+
+    <!-- 暖簾ヘッダー -->
+    <header class="w-full max-w-3xl mx-auto px-3 pt-0">
+        <!-- 暖簾の棒 -->
+        <div class="h-3 bg-gradient-to-b from-[#6d4222] to-[#3e2310] rounded-b-sm shadow-md mx-1"></div>
+        <!-- 暖簾の布 -->
+        <div class="noren-container px-2">
+            <div class="noren-flap flex-1 h-20 sm:h-24 rounded-b-lg flex flex-col items-center justify-center text-white p-1">
+                <span class="text-[10px] sm:text-xs text-amber-300 tracking-widest mb-0.5">打ちたて</span>
+                <span class="font-mincho text-xl sm:text-3xl font-extrabold tracking-widest">丸</span>
+            </div>
+            <div class="noren-flap flex-1 h-20 sm:h-24 rounded-b-lg flex flex-col items-center justify-center text-white p-1">
+                <span class="text-[10px] sm:text-xs text-amber-300 tracking-widest mb-0.5">茹でたて</span>
+                <span class="font-mincho text-xl sm:text-3xl font-extrabold tracking-widest">亀</span>
+            </div>
+            <div class="noren-flap flex-1 h-20 sm:h-24 rounded-b-lg flex flex-col items-center justify-center text-white p-1">
+                <span class="text-[10px] sm:text-xs text-amber-300 tracking-widest mb-0.5">予算厳守</span>
+                <span class="font-mincho text-xl sm:text-3xl font-extrabold tracking-widest">製</span>
+            </div>
+            <div class="noren-flap flex-1 h-20 sm:h-24 rounded-b-lg flex flex-col items-center justify-center text-white p-1">
+                <span class="text-[10px] sm:text-xs text-amber-300 tracking-widest mb-0.5">満腹必至</span>
+                <span class="font-mincho text-xl sm:text-3xl font-extrabold tracking-widest">麺</span>
+            </div>
+        </div>
+
+        <!-- タイトル＆サウンド切替 -->
+        <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-2 px-2">
+            <div class="text-center sm:text-left">
+                <h1 class="font-mincho text-2xl sm:text-3xl font-extrabold text-[#2b1a0e] tracking-tight flex items-center justify-center sm:justify-start gap-2">
+                    <span class="inline-block bg-[#c83228] text-white text-xs sm:text-sm px-2.5 py-1 rounded-md font-sans font-bold shadow-sm">非公式</span>
+                    丸亀製麺 <span id="header-budget-label" class="text-[#c83228]">1,000円</span>ガチャ
+                </h1>
+                <p class="text-xs sm:text-sm text-[#6b5847] mt-0.5">予算内で最高のうどん＆天ぷらセットをお盆に並べよう！</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="menu-list-btn" type="button" class="text-xs sm:text-sm bg-white hover:bg-amber-50 text-[#4a2e1b] border border-[#cbbba0] px-3.5 py-2 rounded-full font-bold shadow-sm transition flex items-center gap-1 cursor-pointer">
+                    <span>📜</span> お品書き一覧
+                </button>
+                <button id="sound-toggle-btn" type="button" class="text-xs sm:text-sm bg-white hover:bg-amber-50 text-[#4a2e1b] border border-[#cbbba0] px-3.5 py-2 rounded-full font-bold shadow-sm transition flex items-center gap-1 cursor-pointer" title="効果音のオン/オフ">
+                    <span id="sound-icon">🔊</span> <span id="sound-text">効果音 ON</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="w-full max-w-3xl mx-auto px-3 sm:px-4 mt-4 flex-1">
+        
+        <!-- 設定コントロールパネル -->
+        <section class="bg-white/95 backdrop-blur-sm border border-[#dfd3be] rounded-2xl p-3.5 sm:p-4 shadow-sm mb-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <!-- 予算選択 -->
+                <div>
+                    <label class="block text-xs font-bold text-[#6b5847] mb-1.5 flex items-center gap-1">
+                        <span>💰</span> 上限予算を選ぶ
+                    </label>
+                    <div class="grid grid-cols-3 gap-1.5" id="budget-selector">
+                        <button type="button" data-budget="500" class="budget-opt py-2 px-2 rounded-xl text-xs sm:text-sm font-bold border border-[#d6c7b2] bg-[#faf7f2] text-[#5c4938] hover:bg-amber-50 transition cursor-pointer">
+                            500円<span class="block text-[10px] font-normal opacity-80">ワンコイン</span>
+                        </button>
+                        <button type="button" data-budget="1000" class="budget-opt active py-2 px-2 rounded-xl text-xs sm:text-sm font-bold border-2 border-[#c83228] bg-[#fff3f2] text-[#c83228] shadow-sm transition cursor-pointer">
+                            1,000円<span class="block text-[10px] font-normal opacity-80">定番ガチャ</span>
+                        </button>
+                        <button type="button" data-budget="1500" class="budget-opt py-2 px-2 rounded-xl text-xs sm:text-sm font-bold border border-[#d6c7b2] bg-[#faf7f2] text-[#5c4938] hover:bg-amber-50 transition cursor-pointer">
+                            1,500円<span class="block text-[10px] font-normal opacity-80">豪遊セット</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- モード選択 -->
+                <div>
+                    <label class="block text-xs font-bold text-[#6b5847] mb-1.5 flex items-center gap-1">
+                        <span>🎲</span> 選出モードを選ぶ
+                    </label>
+                    <div class="grid grid-cols-2 gap-1.5" id="mode-selector">
+                        <button type="button" data-mode="balanced" class="mode-opt active py-2 px-2 rounded-xl text-xs sm:text-sm font-bold border-2 border-[#1c2a44] bg-[#eef2f9] text-[#1c2a44] shadow-sm transition cursor-pointer">
+                            王道バランス<span class="block text-[10px] font-normal opacity-80">うどん1杯＋天ぷら等</span>
+                        </button>
+                        <button type="button" data-mode="chaos" class="mode-opt py-2 px-2 rounded-xl text-xs sm:text-sm font-bold border border-[#d6c7b2] bg-[#faf7f2] text-[#5c4938] hover:bg-amber-50 transition cursor-pointer">
+                            完全ランダム<span class="block text-[10px] font-normal opacity-80">うどん2杯・天ぷら祭りも</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ガチャ実行ボタン -->
+            <div class="mt-4 flex flex-col items-center">
+                <button id="spin-btn" type="button" class="gacha-btn w-full sm:w-4/5 py-3.5 sm:py-4 px-6 rounded-2xl text-white font-black text-lg sm:text-xl tracking-wider flex items-center justify-center gap-3 cursor-pointer">
+                    <span id="btn-icon" class="text-2xl">🍜</span>
+                    <span id="btn-label">ガチャを回す！</span>
+                </button>
+                <p id="lock-hint" class="text-[11px] font-bold text-[#c83228] mt-2 hidden">
+                    🔒 固定（キープ）中の商品は残したまま、残り予算で再抽選します
+                </p>
+            </div>
+        </section>
+
+        <!-- お盆（結果表示エリア） -->
+        <section class="wooden-tray p-4 sm:p-6 mb-5">
+            <!-- お盆上部ステータスバー -->
+            <div class="bg-[#fffdf9]/95 rounded-xl p-3 sm:p-4 mb-4 shadow-sm border border-[#e3d5be] flex flex-wrap items-center justify-between gap-2">
+                <div>
+                    <div class="text-[11px] font-bold text-[#7a6552]">お会計（税込目安）</div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="total-price" class="font-mincho text-3xl sm:text-4xl font-extrabold text-[#2b1a0e]">0</span>
+                        <span class="text-sm font-bold text-[#2b1a0e]">円</span>
+                        <span class="text-xs text-[#6b5847] bg-[#f3ece0] px-2.5 py-0.5 rounded-full font-medium">
+                            残金 <strong id="remaining-price" class="text-[#1c2a44]">1,000</strong>円
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 称号スタンプ -->
+                <div id="title-badge-container" class="hidden">
+                    <div id="combo-title" class="stamp-badge px-3 py-1.5 rounded-lg font-mincho font-extrabold text-sm sm:text-base tracking-wide text-center">
+                        王道の黄金セット
+                    </div>
+                </div>
+            </div>
+
+            <!-- お盆の中身（商品グリッド） -->
+            <div id="tray-items" class="min-h-[210px] flex flex-col items-center justify-center">
+                <!-- 初期状態プレースホルダー -->
+                <div id="empty-state" class="text-center py-8 px-4">
+                    <div class="w-20 h-20 mx-auto mb-3 bg-white/85 rounded-full flex items-center justify-center shadow-inner border-2 border-[#b5804d]">
+                        <!-- シンプルな丼SVG -->
+                        <svg class="w-12 h-12 text-[#7a4b2a]" viewBox="0 0 64 64" fill="none">
+                            <path d="M8 26C8 40 18 50 32 50C46 50 56 40 56 26H8Z" fill="#243656" stroke="#162238" stroke-width="3"/>
+                            <path d="M22 50L20 56H44L42 50" fill="#162238"/>
+                            <path d="M12 26C16 20 24 22 32 22C40 22 48 20 52 26" stroke="#f7f4ec" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M24 14C24 11 26 9 26 6M32 13C32 10 34 8 34 5M40 14C40 11 42 9 42 6" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+                        </svg>
+                    </div>
+                    <p class="font-mincho font-bold text-lg text-[#3d2412] drop-shadow-sm">お盆は空っぽです</p>
+                    <p class="text-xs sm:text-sm text-[#4a2e1b] mt-1 font-medium">上の「ガチャを回す！」ボタンを押して、今日の丸亀メニューを決めましょう！</p>
+                </div>
+            </div>
+
+            <!-- アクションバー（結果表示後に出現） -->
+            <div id="result-actions" class="hidden mt-4 pt-3 border-t border-[#9e6938]/40 flex flex-wrap items-center justify-between gap-2">
+                <button id="clear-locks-btn" type="button" class="text-xs bg-white/95 hover:bg-white text-[#4a2e1b] px-3 py-2 rounded-lg font-bold shadow-sm transition flex items-center gap-1 cursor-pointer">
+                    <span>🔓</span> 固定を全解除
+                </button>
+                <div class="flex items-center gap-2 ml-auto">
+                    <button id="copy-result-btn" type="button" class="text-xs sm:text-sm bg-[#1c2a44] hover:bg-[#2a3f66] text-white px-4 py-2 rounded-lg font-bold shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+                        <span>📋</span> 結果をコピー
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 履歴セクション -->
+        <section id="history-section" class="hidden bg-white/95 border border-[#dfd3be] rounded-2xl p-4 shadow-sm mb-6">
+            <div class="flex items-center justify-between mb-2.5">
+                <h2 class="font-mincho font-bold text-base text-[#2b1a0e] flex items-center gap-1.5">
+                    <span>🧾</span> 最近の注文履歴（直近5件）
+                </h2>
+                <button id="clear-history-btn" type="button" class="text-xs text-[#8a7560] hover:text-[#c83228] underline cursor-pointer">履歴を消す</button>
+            </div>
+            <div id="history-list" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+        </section>
+
+    </main>
+
+    <!-- フッター注釈 -->
+    <footer class="w-full max-w-3xl mx-auto px-4 text-center text-[11px] text-[#7a6552] space-y-1">
+        <p>※掲載しているメニューおよび価格は参考用の目安です。店舗・時期・地域により取扱いや価格が異なる場合があります。</p>
+        <p>※本アプリはファンメイドの非公式シミュレーターです。</p>
+    </footer>
+
+    <!-- トースト通知（alert代替） -->
+    <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-[#1c2a44] text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-300 z-50 flex items-center gap-2">
+        <span id="toast-icon">✅</span>
+        <span id="toast-msg">コピーしました！</span>
+    </div>
+
+    <!-- お品書きモーダル -->
+    <div id="menu-modal" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden items-center justify-center p-3 sm:p-4">
+        <div class="bg-[#fcf9f2] border-2 border-[#8a5629] rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="bg-[#1c2a44] text-white px-4 py-3 flex items-center justify-between">
+                <h3 class="font-mincho font-bold text-lg flex items-center gap-2">
+                    <span>📜</span> 収録お品書き一覧（全<span id="total-menu-count">0</span>品）
+                </h3>
+                <button id="close-modal-btn" type="button" class="text-white/80 hover:text-white text-2xl font-bold px-2 leading-none cursor-pointer">&times;</button>
+            </div>
+            <div class="p-4 overflow-y-auto space-y-4 text-sm" id="modal-menu-content">
+                <!-- JSで動的生成 -->
+            </div>
+            <div class="p-3 bg-[#f2ece1] border-t border-[#dfd3be] text-right">
+                <button id="close-modal-footer-btn" type="button" class="bg-[#4a2e1b] text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-[#633f26] transition cursor-pointer">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * 丸亀製麺 全収録メニューデータ
+         * category: 'udon' | 'tempura' | 'rice' | 'topping'
+         */
+        const MENU_ITEMS = [
+            // 【うどん（並・得・セット）】
+            { id: 'u_kamaage_n', name: '釜揚げうどん（並）', price: 390, category: 'udon', badge: 'うどん', desc: 'もちもち食感の看板メニュー' },
+            { id: 'u_kake_n', name: 'かけうどん（並）', price: 390, category: 'udon', badge: 'うどん', desc: '香り高いだしが自慢の定番' },
+            { id: 'u_bukkake_n', name: 'ぶっかけうどん（並）', price: 440, category: 'udon', badge: 'うどん', desc: '濃いめのだしでコシを堪能' },
+            { id: 'u_zaru_n', name: 'ざるうどん（並）', price: 440, category: 'udon', badge: 'うどん', desc: '水で締めた喉ごし爽やかな一杯' },
+            { id: 'u_oroshishoyu_n', name: 'おろし醤油うどん（並）', price: 550, category: 'udon', badge: 'うどん', desc: '大根おろしとだし醤油でさっぱり' },
+            { id: 'u_kamatama_n', name: '釜玉うどん（並）', price: 490, category: 'udon', badge: 'うどん', desc: '熱々麺に玉子がとろ〜り絡む' },
+            { id: 'u_mentai_n', name: '明太釜玉うどん（並）', price: 590, category: 'udon', badge: 'うどん', desc: '明太子と玉子の濃厚ハーモニー' },
+            { id: 'u_torotama_n', name: 'とろ玉うどん（並）', price: 640, category: 'udon', badge: 'うどん', desc: 'とろろと温泉玉子のまろやかさ' },
+            { id: 'u_niku_n', name: '肉かけうどん（並）', price: 840, category: 'udon', badge: 'うどん', desc: '甘辛牛肉の旨みがだしに溶け込む' },
+            { id: 'u_curry_n', name: 'カレーうどん（並）', price: 660, category: 'udon', badge: 'うどん', desc: '和風だし香るスパイシーな一杯' },
+            { id: 'u_tamago_ankake_n', name: '玉子あんかけうどん（並）', price: 590, category: 'udon', badge: 'うどん', tag: '季節限定', desc: 'ふわふわ玉子あんが体の中から温める' },
+            { id: 'u_mentai_ankake_n', name: '明太玉子あんかけうどん（並）', price: 690, category: 'udon', badge: 'うどん', tag: '季節限定', desc: 'ピリ辛明太子と熱々玉子あんの一体感' },
+            { id: 'u_kamonegi_n', name: '鴨ねぎうどん（並）', price: 890, category: 'udon', badge: 'うどん', tag: '季節限定', desc: '合鴨肉の旨みと焼きねぎの香ばしさ' },
+            { id: 'u_kakitama_n', name: '牡蠣たまあんかけうどん（並）', price: 890, category: 'udon', badge: 'うどん', tag: '季節限定', desc: 'ぷりっと濃厚な牡蠣と熱々玉子あんかけ' },
+            { id: 'u_nikugobo_n', name: '肉ごぼううどん（並）', price: 640, category: 'udon', badge: 'うどん', tag: '季節・限定', desc: '甘辛牛肉と香ばしいごぼうの風味' },
+            { id: 'u_umakara_buta_n', name: '旨辛豚つけ汁うどん', price: 990, category: 'udon', badge: 'うどん', desc: '３玉まで値段一緒で豚肉の旨みとラー油の辛みがクセになる' },
+            { id: 'u_mentai_cream_n', name: '明太クリームうどん（並）', price: 690, category: 'udon', badge: 'うどん', desc: '濃厚クリームと明太子が絡む洋風仕立て' },
+            { id: 'u_katsudon_set', name: 'カツ丼セット（かけorぶっかけうどん並付）', price: 840, category: 'udon', badge: 'うどん・セット', isSet: true, desc: 'サクッとジューシーなカツ丼とうどんの満腹セット' },
+            { id: 'u_katsudon_set_d', name: 'カツ丼セット（かけorぶっかけうどん大付）', price: 1030, category: 'udon', badge: 'うどん・セット', isSet: true, desc: '麺1.5玉のうどん大サイズとサクッとカツ丼の超満腹セット' },
+            { id: 'u_katsudon_set_t', name: 'カツ丼セット（かけorぶっかけうどん得付）', price: 1220, category: 'udon', badge: 'うどん・セット', isSet: true, desc: '麺2玉のうどん得サイズとカツ丼がタッグを組んだ最強ボリュームセット' },
+            { id: 'u_oyakodon_set', name: '親子丼セット（かけorぶっかけうどん並付）', price: 790, category: 'udon', badge: 'うどん・セット', isSet: true, desc: 'ふわとろ玉子の親子丼とうどんの黄金コンビ' },
+            { id: 'u_oyakodon_set_d', name: '親子丼セット（かけorぶっかけうどん大付）', price: 980, category: 'udon', badge: 'うどん・セット', isSet: true, desc: '麺1.5玉のうどん大サイズとふわとろ親子丼の満足セット' },
+            { id: 'u_oyakodon_set_t', name: '親子丼セット（かけorぶっかけうどん得付）', price: 1170, category: 'udon', badge: 'うどん・セット', isSet: true, desc: '麺2玉のうどん得サイズと親子丼を心ゆくまで味わう特盛セット' },
+            { id: 'u_nikubukkake_n', name: '肉ぶっかけうどん（並）', price: 890, category: 'udon', badge: 'うどん', desc: '甘辛く炊いた牛肉が濃いめのだしと絡む人気メニュー' },
+            { id: 'u_kamaage_t', name: '釜揚げうどん（得）', price: 770, category: 'udon', badge: 'うどん', desc: '麺2玉分の大迫力！木桶で味わう得サイズ' },
+            { id: 'u_kake_t', name: 'かけうどん（得）', price: 770, category: 'udon', badge: 'うどん', desc: 'たっぷりのおだしと麺を堪能する得サイズ' },
+            { id: 'u_bukkake_t', name: 'ぶっかけうどん（得）', price: 820, category: 'udon', badge: 'うどん', desc: '強いコシを思いっきり頬張る特盛サイズ' },
+            { id: 'u_kamaage_d', name: '釜揚げうどん（大）', price: 580, category: 'udon', badge: 'うどん', desc: '麺1.5玉！もちもち食感をたっぷり味わう大サイズ' },
+            { id: 'u_kake_d', name: 'かけうどん（大）', price: 580, category: 'udon', badge: 'うどん', desc: '麺1.5玉！香り高いだしと一緒に大満足' },
+            { id: 'u_bukkake_d', name: 'ぶっかけうどん（大）', price: 630, category: 'udon', badge: 'うどん', desc: '麺1.5玉！濃いめのだしでコシをたっぷり堪能' },
+            { id: 'u_zaru_d', name: 'ざるうどん（大）', price: 630, category: 'udon', badge: 'うどん', desc: '麺1.5玉！水で締めた喉ごし爽やかな大サイズ' },
+            { id: 'u_zaru_t', name: 'ざるうどん（得）', price: 820, category: 'udon', badge: 'うどん', desc: '麺2玉！清涼感あふれるざるうどんの特盛サイズ' },
+            { id: 'u_oroshishoyu_d', name: 'おろし醤油うどん（大）', price: 740, category: 'udon', badge: 'うどん', desc: '麺1.5玉！大根おろしとだし醤油でさっぱり大盛り' },
+            { id: 'u_oroshishoyu_t', name: 'おろし醤油うどん（得）', price: 930, category: 'udon', badge: 'うどん', desc: '麺2玉！さっぱりおろし醤油を豪快に味わう得サイズ' },
+            { id: 'u_kamatama_d', name: '釜玉うどん（大）', price: 680, category: 'udon', badge: 'うどん', desc: '麺1.5玉！熱々麺に玉子がとろ〜り絡む大サイズ' },
+            { id: 'u_kamatama_t', name: '釜玉うどん（得）', price: 870, category: 'udon', badge: 'うどん', desc: '麺2玉！濃厚な釜玉を心ゆくまで堪能する得サイズ' },
+            { id: 'u_mentai_d', name: '明太釜玉うどん（大）', price: 780, category: 'udon', badge: 'うどん', desc: '麺1.5玉！明太子と玉子の濃厚ハーモニーを大盛りで' },
+            { id: 'u_mentai_t', name: '明太釜玉うどん（得）', price: 970, category: 'udon', badge: 'うどん', desc: '麺2玉！明太釜玉をたっぷり頬張る贅沢得サイズ' },
+            { id: 'u_torotama_d', name: 'とろ玉うどん（大）', price: 830, category: 'udon', badge: 'うどん', desc: '麺1.5玉！とろろと温泉玉子のまろやか大盛り' },
+            { id: 'u_torotama_t', name: 'とろ玉うどん（得）', price: 1020, category: 'udon', badge: 'うどん', desc: '麺2玉！とろ玉を豪快にすする満腹得サイズ' },
+            { id: 'u_niku_d', name: '肉かけうどん（大）', price: 1030, category: 'udon', badge: 'うどん', desc: '麺1.5玉！甘辛牛肉の旨みがだしに溶け込む大盛り' },
+            { id: 'u_niku_t', name: '肉かけうどん（得）', price: 1220, category: 'udon', badge: 'うどん', desc: '麺2玉！甘辛牛肉とうどんを存分に味わう得サイズ' },
+            { id: 'u_curry_d', name: 'カレーうどん（大）', price: 850, category: 'udon', badge: 'うどん', desc: '麺1.5玉！和風だし香るスパイシーな大サイズ' },
+            { id: 'u_curry_t', name: 'カレーうどん（得）', price: 1040, category: 'udon', badge: 'うどん', desc: '麺2玉！熱々スパイシーなカレーうどんの得サイズ' },
+            { id: 'u_tamago_ankake_d', name: '玉子あんかけうどん（大）', price: 780, category: 'udon', badge: 'うどん', tag: '季節限定', desc: '麺1.5玉！ふわふわ玉子あんが体の中から温める大盛り' },
+            { id: 'u_tamago_ankake_t', name: '玉子あんかけうどん（得）', price: 970, category: 'udon', badge: 'うどん', tag: '季節限定', desc: '麺2玉！熱々玉子あんかけをたっぷり味わう得サイズ' },
+            { id: 'u_mentai_ankake_d', name: '明太玉子あんかけうどん（大）', price: 880, category: 'udon', badge: 'うどん', tag: '季節限定', desc: '麺1.5玉！ピリ辛明太子と熱々玉子あんの大盛り' },
+            { id: 'u_mentai_ankake_t', name: '明太玉子あんかけうどん（得）', price: 1070, category: 'udon', badge: 'うどん', tag: '季節限定', desc: '麺2玉！明太玉子あんかけの贅沢得サイズ' },
+            { id: 'u_kamonegi_d', name: '鴨ねぎうどん（大）', price: 1080, category: 'udon', badge: 'うどん', tag: '季節限定', desc: '麺1.5玉！合鴨肉の旨みと焼きねぎの香ばしさを大盛りで' },
+            { id: 'u_kamonegi_t', name: '鴨ねぎうどん（得）', price: 1270, category: 'udon', badge: 'うどん', tag: '季節限定', desc: '麺2玉！鴨ねぎうどんを思いっきり堪能する得サイズ' },
+            { id: 'u_kakitama_d', name: '牡蠣たまあんかけうどん（大）', price: 1080, category: 'udon', badge: 'うどん', tag: '季節限定', desc: '麺1.5玉！ぷりっと濃厚な牡蠣と熱々玉子あんの大盛り' },
+            { id: 'u_kakitama_t', name: '牡蠣たまあんかけうどん（得）', price: 1270, category: 'udon', badge: 'うどん', tag: '季節限定', desc: '麺2玉！濃厚な牡蠣たまあんかけの満腹得サイズ' },
+            { id: 'u_nikugobo_d', name: '肉ごぼううどん（大）', price: 830, category: 'udon', badge: 'うどん', tag: '季節・限定', desc: '麺1.5玉！甘辛牛肉と香ばしいごぼうの大盛り' },
+            { id: 'u_nikugobo_t', name: '肉ごぼううどん（得）', price: 1020, category: 'udon', badge: 'うどん', tag: '季節・限定', desc: '麺2玉！肉ごぼううどんを豪快に味わう得サイズ' },
+            { id: 'u_mentai_cream_d', name: '明太クリームうどん（大）', price: 880, category: 'udon', badge: 'うどん', desc: '麺1.5玉！濃厚クリームと明太子が絡む大サイズ' },
+            { id: 'u_mentai_cream_t', name: '明太クリームうどん（得）', price: 1070, category: 'udon', badge: 'うどん', desc: '麺2玉！洋風仕立ての明太クリームを贅沢に得サイズで' },
+            { id: 'u_nikubukkake_d', name: '肉ぶっかけうどん（大）', price: 1080, category: 'udon', badge: 'うどん', desc: '麺1.5玉！甘辛牛肉と濃いめだしをたっぷり味わう大盛り' },
+            { id: 'u_nikubukkake_t', name: '肉ぶっかけうどん（得）', price: 1270, category: 'udon', badge: 'うどん', desc: '麺2玉！肉ぶっかけうどんを豪快に頬張る特盛サイズ' },
+            { id: 'u_kitsune_n', name: 'きつねうどん（並）', price: 590, category: 'udon', badge: 'うどん', desc: '大判のきつねあげの甘みが香り高いかけだしに溶け出す定番' },
+            { id: 'u_kitsune_d', name: 'きつねうどん（大）', price: 780, category: 'udon', badge: 'うどん', desc: '麺1.5玉！甘辛お揚げとかけだしをたっぷり味わう大サイズ' },
+            { id: 'u_kitsune_t', name: 'きつねうどん（得）', price: 970, category: 'udon', badge: 'うどん', desc: '麺2玉！大判お揚げときつねうどんを存分に堪能する得サイズ' },
+
+            // 【天ぷら】
+            { id: 't_kashiwa', name: 'かしわ天', price: 220, category: 'tempura', badge: '天ぷら', desc: 'ジューシーな鶏むね肉の人気No.1天' },
+            { id: 't_kakiage', name: '野菜かき揚げ', price: 200, category: 'tempura', badge: '天ぷら', desc: 'サクサク食感でボリューム満点' },
+            { id: 't_ebi', name: 'えび天', price: 200, category: 'tempura', badge: '天ぷら', desc: 'ぷりっぷりの王道天ぷら' },
+            { id: 't_chikuwa', name: 'ちくわ天', price: 170, category: 'tempura', badge: '天ぷら', desc: 'だしに浸しても最高の名脇役' },
+            { id: 't_tamago', name: '半熟玉子天', price: 160, category: 'tempura', badge: '天ぷら', desc: '割ると黄身がとろけ出す逸品' },
+            { id: 't_ika', name: 'いか天', price: 190, category: 'tempura', badge: '天ぷら', desc: 'やわらかく噛むほど旨い' },
+            { id: 't_satsuma', name: 'さつまいも天', price: 170, category: 'tempura', badge: '天ぷら', desc: 'ほくほく甘いおやつ感覚の天ぷら' },
+            { id: 't_renkon', name: 'れんこん天', price: 160, category: 'tempura', badge: '天ぷら', desc: 'シャキッと歯ごたえが心地よい' },
+            { id: 't_kisu', name: 'キス天', price: 190, category: 'tempura', badge: '天ぷら', desc: 'ふっくら上品な白身魚の天ぷら' },
+            { id: 't_kabocha', name: 'かぼちゃ天', price: 150, category: 'tempura', badge: '天ぷら', desc: 'ほっくり自然な甘みが嬉しい定番野菜天' },
+            { id: 't_gobokakiage', name: 'ごぼうかき揚げ', price: 120, category: 'tempura', badge: '天ぷら', desc: '香ばしいごぼうの風味とサクサク食感' },
+
+            // 【おむすび・いなり・ごはん】
+            { id: 'r_inari', name: 'いなり', price: 160, category: 'rice', badge: 'ご飯もの', desc: 'じゅわっと甘いお揚げがたまらない' },
+            { id: 'r_wasabi_inari', name: 'わさびいなり', price: 170, category: 'rice', badge: 'ご飯もの', desc: 'ツンと爽やかなわさびがアクセントの大人味' },
+            { id: 'r_sake', name: '鮭おむすび', price: 170, category: 'rice', badge: 'ご飯もの', desc: 'ふっくらご飯に塩鮭の定番' },
+            { id: 'r_mentaiko', name: '明太子おむすび', price: 170, category: 'rice', badge: 'ご飯もの', desc: 'ピリ辛明太子がうどんに合う' },
+            { id: 'r_konbu', name: 'こんぶおむすび', price: 170, category: 'rice', badge: 'ご飯もの', desc: '旨みたっぷりの佃煮昆布おむすび' },
+            { id: 'r_ume', name: '梅おむすび', price: 170, category: 'rice', badge: 'ご飯もの', desc: 'さっぱりとした後味の梅干し' },
+            { id: 'r_tendon', name: '天丼用ごはん', price: 180, category: 'rice', badge: 'ご飯もの', desc: '好きな天ぷらをのせてオリジナル天丼に' },
+
+            // 【トッピング・その他】
+            { id: 'p_ontama', name: '温泉玉子', price: 110, category: 'topping', badge: 'トッピング', desc: 'どのうどんにも合う万能選手' },
+            { id: 'p_oroshi', name: '大根おろし', price: 90, category: 'topping', badge: 'トッピング', desc: 'さっぱり味変したい時に最適' },
+            { id: 'p_mentai', name: '明太子', price: 90, category: 'topping', badge: 'トッピング', desc: 'ちょい足しで贅沢気分に' },
+            { id: 'p_tororo', name: 'とろろ', price: 90, category: 'topping', badge: 'トッピング', desc: 'ツルッと喉ごしアップ' },
+            { id: 'p_namatamago', name: '生玉子', price: 110, category: 'topping', badge: 'トッピング', desc: '熱々うどんに落として釜玉風に！' },
+            { id: 'p_negi', name: 'ねぎ（無料薬味）', price: 0, category: 'topping', badge: '無料薬味', isFree: true, desc: 'シャキシャキ食感と爽やかな香りの定番薬味' },
+            { id: 'p_shoga', name: '生姜（無料薬味）', price: 0, category: 'topping', badge: '無料薬味', isFree: true, desc: '爽やかな辛みと香りでだしが引き締まる定番薬味' },
+            { id: 'p_tenkasu', name: '天かす（無料薬味）', price: 0, category: 'topping', badge: '無料薬味', isFree: true, desc: 'サクサク感とコクをプラスする万能薬味' },
+            { id: 'p_wakame', name: 'わかめ（無料薬味）', price: 0, category: 'topping', badge: '無料薬味', isFree: true, desc: '磯の香りと食感がうれしい無料トッピング' },
+            { id: 'p_wasabi', name: 'わさび（無料薬味）', price: 0, category: 'topping', badge: '無料薬味', isFree: true, desc: '冷たいうどんやだし茶漬け風の味変にぴったり' }
+        ];
+
+        // アプリ状態
+        const state = {
+            budget: 1000,
+            mode: 'balanced', // 'balanced' | 'chaos'
+            currentItems: [], // { uid, item, locked }
+            isSpinning: false,
+            soundEnabled: true,
+            history: []
+        };
+
+        // Web Audio API 効果音エンジン
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+            // ボタンクリック音
+            playClick(pitch = 520) {
+                if (!state.soundEnabled) return;
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(pitch, now);
+                osc.frequency.exponentialRampToValueAtTime(pitch * 1.25, now + 0.045);
+                gain.gain.setValueAtTime(0.14, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.055);
+            }
+            // スロット回転音（拍子木・木琴風）
+            playSlotTick(pitch = 440) {
+                if (!state.soundEnabled) return;
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(pitch, now);
+                osc.frequency.exponentialRampToValueAtTime(pitch * 0.65, now + 0.06);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.07);
+            }
+            // 決定時の和風ファンファーレ（ピタリ賞は豪華版）
+            playFanfare(isJackpot = false) {
+                if (!state.soundEnabled) return;
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+
+                // 和太鼓の「ドン！」
+                const drumOsc = this.ctx.createOscillator();
+                const drumGain = this.ctx.createGain();
+                drumOsc.type = 'sine';
+                drumOsc.frequency.setValueAtTime(145, now);
+                drumOsc.frequency.exponentialRampToValueAtTime(42, now + 0.42);
+                drumGain.gain.setValueAtTime(0.42, now);
+                drumGain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                drumOsc.connect(drumGain);
+                drumGain.connect(this.ctx.destination);
+                drumOsc.start(now);
+                drumOsc.stop(now + 0.46);
+
+                // ヨナ抜き音階（和風メロディ）
+                const notes = isJackpot
+                    ? [523.25, 587.33, 659.25, 783.99, 1046.50] // ド・レ・ミ・ソ・高ド
+                    : [523.25, 659.25, 783.99];                 // ド・ミ・ソ
+
+                notes.forEach((freq, idx) => {
+                    const start = now + idx * (isJackpot ? 0.085 : 0.095);
+                    const duration = idx === notes.length - 1 ? 0.45 : 0.14;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, start);
+                    gain.gain.setValueAtTime(0.22, start);
+                    gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(start);
+                    osc.stop(start + duration + 0.02);
+                });
+            }
+        }
+        const sfx = new SoundFX();
+
+        // カテゴリ別SVGイラスト生成
+        function getCategorySVG(category) {
+            switch (category) {
+                case 'udon':
+                    return `
+                    <svg class="w-10 h-10 shrink-0" viewBox="0 0 64 64" fill="none">
+                        <path d="M7 28C7 42 17 51 32 51C47 51 57 42 57 28H7Z" fill="#243656" stroke="#162238" stroke-width="2.5"/>
+                        <path d="M21 51L19 56H45L43 51" fill="#162238"/>
+                        <ellipse cx="32" cy="28" rx="23" ry="6" fill="#d99b52"/>
+                        <path d="M15 28C20 24 27 25 32 28C37 31 44 30 49 27" stroke="#fffdf7" stroke-width="3.5" stroke-linecap="round"/>
+                        <path d="M19 25C25 22 33 23 43 26" stroke="#fffdf7" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="38" cy="26" r="3" fill="#4f9e45"/>
+                    </svg>`;
+                case 'tempura':
+                    return `
+                    <svg class="w-10 h-10 shrink-0" viewBox="0 0 64 64" fill="none">
+                        <ellipse cx="32" cy="48" rx="22" ry="6" fill="#e5dec9"/>
+                        <path d="M16 38C16 26 24 18 35 18C45 18 50 25 48 35C46 43 38 46 27 46C20 46 16 43 16 38Z" fill="#f2b84b" stroke="#c7831e" stroke-width="2.5"/>
+                        <circle cx="26" cy="30" r="2" fill="#fce19c"/>
+                        <circle cx="35" cy="26" r="2.5" fill="#fce19c"/>
+                        <circle cx="38" cy="35" r="2" fill="#fce19c"/>
+                        <circle cx="28" cy="38" r="1.8" fill="#fce19c"/>
+                    </svg>`;
+                case 'rice':
+                    return `
+                    <svg class="w-10 h-10 shrink-0" viewBox="0 0 64 64" fill="none">
+                        <path d="M32 13L50 47C51.5 49.5 49.5 52 46.5 52H17.5C14.5 52 12.5 49.5 14 47L32 13Z" fill="#ffffff" stroke="#d1c7b7" stroke-width="2.5" stroke-linejoin="round"/>
+                        <path d="M24 38H40V52H24V38Z" fill="#1e2923"/>
+                        <circle cx="32" cy="27" r="3" fill="#d9382e"/>
+                    </svg>`;
+                default: // topping
+                    return `
+                    <svg class="w-10 h-10 shrink-0" viewBox="0 0 64 64" fill="none">
+                        <path d="M14 34C14 44 22 50 32 50C42 50 50 44 50 34H14Z" fill="#f7f4ec" stroke="#b5a68e" stroke-width="2.5"/>
+                        <circle cx="27" cy="31" r="5" fill="#52a346"/>
+                        <circle cx="36" cy="31" r="5" fill="#68b85c"/>
+                        <circle cx="31" cy="27" r="4.5" fill="#438c38"/>
+                    </svg>`;
+            }
+        }
+
+        // カテゴリバッジ色
+        function getCategoryBadgeStyle(category) {
+            switch (category) {
+                case 'udon': return 'bg-[#1c2a44] text-white';
+                case 'tempura': return 'bg-[#d9821e] text-white';
+                case 'rice': return 'bg-[#3b7a57] text-white';
+                default: return 'bg-[#8a6d4b] text-white';
+            }
+        }
+
+        // トースト通知表示
+        let toastTimer = null;
+        function showToast(msg, icon = '✅') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            document.getElementById('toast-icon').textContent = icon;
+            toast.classList.remove('opacity-0', 'translate-y-2');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 2400);
+        }
+
+        // ユーティリティ: 配列からランダム要素取得
+        function pickRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // ガチャ抽選ロジック
+        function generateCombo() {
+            const budget = state.budget;
+            const mode = state.mode;
+
+            // ロックされた商品を保持
+            const lockedEntries = state.currentItems.filter(entry => entry.locked);
+            let selected = lockedEntries.map(entry => ({ ...entry }));
+            let currentTotal = selected.reduce((sum, e) => sum + e.item.price, 0);
+
+            // すでに予算オーバーしている場合（予算変更時など）
+            if (currentTotal > budget) {
+                showToast('固定中の合計が予算を超えています！', '⚠️');
+                return selected;
+            }
+
+            let remaining = budget - currentTotal;
+
+            if (mode === 'balanced') {
+                // 【王道バランスモード】
+                // 1. 固定済みにうどん枠（丼セット含む）が無い場合、まず予算内のうどんを1杯選ぶ
+                const hasUdon = selected.some(e => e.item.category === 'udon');
+                if (!hasUdon) {
+                    const affordableUdons = MENU_ITEMS.filter(m => m.category === 'udon' && m.price <= remaining);
+                    if (affordableUdons.length > 0) {
+                        const udon = pickRandom(affordableUdons);
+                        selected.push({ uid: crypto.randomUUID(), item: udon, locked: false });
+                        remaining -= udon.price;
+                    }
+                }
+
+                // 2. 残りの予算で天ぷら・ご飯もの・トッピングをバランス良く追加
+                const hasDonSet = () => selected.some(e => e.item.isSet);
+                let safetyCounter = 0;
+                while (safetyCounter < 25) {
+                    safetyCounter++;
+                    const freeCount = selected.filter(s => s.item.isFree).length;
+                    const candidates = MENU_ITEMS.filter(m => {
+                        if (m.price > remaining) return false;
+                        if (m.category === 'udon') return false; // 王道モードではうどん枠の重複なし
+                        if (hasDonSet() && m.category === 'rice') return false; // 丼セット時はご飯ものの重複を避ける
+                        if (m.isFree && freeCount >= 2) return false; // 無料薬味は最大2種類まで
+                        // 同じ商品は最大1個まで
+                        const sameCount = selected.filter(s => s.item.id === m.id).length;
+                        return sameCount < 1;
+                    });
+
+                    if (candidates.length === 0) break;
+
+                    // 残り予算をなるべく使い切るため、有料サイドメニューを優先し無料薬味は控えめに重み付け
+                    const hasTamagoAnkake = selected.some(s => s.item.name.includes('玉子あんかけ'));
+                    const weighted = [];
+                    candidates.forEach(c => {
+                        let weight = c.isFree ? 1 : (c.price >= 140 ? 4 : 3);
+                        // 玉子あんかけ系のときは「おろししょうが」が相性抜群なので確率アップ
+                        if (hasTamagoAnkake && c.id === 'p_shoga') {
+                            weight = 5;
+                        }
+                        for (let i = 0; i < weight; i++) weighted.push(c);
+                    });
+
+                    const chosen = pickRandom(weighted);
+                    selected.push({ uid: crypto.randomUUID(), item: chosen, locked: false });
+                    remaining -= chosen.price;
+                }
+
+            } else {
+                // 【完全ランダムモード】
+                let safetyCounter = 0;
+                while (safetyCounter < 30) {
+                    safetyCounter++;
+                    const freeCount = selected.filter(s => s.item.isFree).length;
+                    const candidates = MENU_ITEMS.filter(m => {
+                        if (m.price > remaining) return false;
+                        if (m.isFree) {
+                            // 無料薬味は最大2種類まで＆同じ薬味の重複なし
+                            if (freeCount >= 2) return false;
+                            return !selected.some(s => s.item.id === m.id);
+                        }
+                        return true;
+                    });
+                    if (candidates.length === 0) break;
+
+                    const hasTamagoAnkake = selected.some(s => s.item.name.includes('玉子あんかけ'));
+                    const weighted = [];
+                    candidates.forEach(c => {
+                        let weight = c.isFree ? 1 : 3;
+                        if (hasTamagoAnkake && c.id === 'p_shoga') {
+                            weight = 4;
+                        }
+                        for (let i = 0; i < weight; i++) weighted.push(c);
+                    });
+
+                    const chosen = pickRandom(weighted);
+                    selected.push({ uid: crypto.randomUUID(), item: chosen, locked: false });
+                    remaining -= chosen.price;
+                }
+            }
+
+            // 表示順を整理（うどん → 天ぷら → ご飯もの → トッピング）
+            const orderMap = { udon: 1, tempura: 2, rice: 3, topping: 4 };
+            selected.sort((a, b) => orderMap[a.item.category] - orderMap[b.item.category]);
+
+            return selected;
+        }
+
+        // 称号判定ロジック
+        function evaluateCombo(items, total, budget) {
+            const diff = budget - total;
+            const udons = items.filter(e => e.item.category === 'udon');
+            const tempuras = items.filter(e => e.item.category === 'tempura');
+            const rices = items.filter(e => e.item.category === 'rice');
+            const toppings = items.filter(e => e.item.category === 'topping');
+            const hasDonSet = udons.some(e => Boolean(e.item.isSet));
+            const hasTokuUdon = udons.some(e => e.item.name.includes('（得）'));
+            const hasDaiUdon = udons.some(e => e.item.name.includes('（大）'));
+            const hasSeasonalUdon = udons.some(e => Boolean(e.item.tag));
+            const hasTamagoAnkakeWithShoga =
+                udons.some(e => e.item.name.includes('玉子あんかけ')) &&
+                items.some(e => e.item.id === 'p_shoga');
+
+            if (diff === 0) {
+                return `🎊 ${budget.toLocaleString()}円ピッタリ！神引きの丸亀マスター`;
+            }
+            if (hasTamagoAnkakeWithShoga) {
+                return '🫚🥚 心も体もポカポカ！玉子あんかけ＆生姜の黄金コンビ';
+            }
+            if (hasDonSet) {
+                return '🍚🍜 満腹確定！うどん＆丼のダブル主役セット';
+            }
+            if (udons.length >= 2) {
+                return '🍜🍜 夢のうどん二刀流！麺食い番長';
+            }
+            if (hasTokuUdon) {
+                return '🍜🔥 大迫力の（得）サイズ！お腹いっぱい満腹セット';
+            }
+            if (hasDaiUdon) {
+                return '🍜✨ 食べ応え抜群の（大）サイズ！満足ボリュームセット';
+            }
+            if (hasSeasonalUdon) {
+                return '🍂 今だけの贅沢！季節限定メニュー満喫セット';
+            }
+            if (budget === 500 && diff <= 50) {
+                return '🪙 賢いやりくり！ワンコイン満喫セット';
+            }
+            if (udons.length === 0 && tempuras.length >= 3) {
+                return '🍤 揚げ物パラダイス！天ぷら祭りセット';
+            }
+            if (items.some(e => e.item.id === 'r_tendon') && tempuras.length >= 2) {
+                return '🍚 通の楽しみ方！セルフ天丼カスタム';
+            }
+            if (udons.length === 1 && tempuras.length >= 1 && rices.length >= 1 && diff <= 60) {
+                return '👑 攻守最強！王道の黄金フルコース';
+            }
+            if (toppings.length >= 2) {
+                return '✨ 味変自在！こだわりトッピング職人';
+            }
+            if (diff <= 30) {
+                return '🎯 ニアピン賞！お会計上手の達人';
+            }
+            if (udons.length === 1 && tempuras.length >= 2) {
+                return '🥢 サクサク天ぷら三昧！満足セット';
+            }
+            return '😋 今日も美味しい！丸亀満喫セット';
+        }
+
+        // UIレンダリング
+        function renderTray(animate = false) {
+            const container = document.getElementById('tray-items');
+            const totalEl = document.getElementById('total-price');
+            const remEl = document.getElementById('remaining-price');
+            const badgeContainer = document.getElementById('title-badge-container');
+            const titleEl = document.getElementById('combo-title');
+            const actionsEl = document.getElementById('result-actions');
+            const lockHintEl = document.getElementById('lock-hint');
+
+            const total = state.currentItems.reduce((sum, e) => sum + e.item.price, 0);
+            const remaining = state.budget - total;
+
+            totalEl.textContent = total.toLocaleString();
+            remEl.textContent = remaining.toLocaleString();
+
+            if (remaining === 0 && state.currentItems.length > 0) {
+                totalEl.classList.add('text-[#c83228]');
+                totalEl.classList.remove('text-[#2b1a0e]');
+            } else {
+                totalEl.classList.remove('text-[#c83228]');
+                totalEl.classList.add('text-[#2b1a0e]');
+            }
+
+            if (state.currentItems.length === 0) {
+                container.innerHTML = `
+                    <div id="empty-state" class="text-center py-8 px-4">
+                        <div class="w-20 h-20 mx-auto mb-3 bg-white/85 rounded-full flex items-center justify-center shadow-inner border-2 border-[#b5804d]">
+                            <svg class="w-12 h-12 text-[#7a4b2a]" viewBox="0 0 64 64" fill="none">
+                                <path d="M8 26C8 40 18 50 32 50C46 50 56 40 56 26H8Z" fill="#243656" stroke="#162238" stroke-width="3"/>
+                                <path d="M22 50L20 56H44L42 50" fill="#162238"/>
+                                <path d="M12 26C16 20 24 22 32 22C40 22 48 20 52 26" stroke="#f7f4ec" stroke-width="3" stroke-linecap="round"/>
+                                <path d="M24 14C24 11 26 9 26 6M32 13C32 10 34 8 34 5M40 14C40 11 42 9 42 6" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+                            </svg>
+                        </div>
+                        <p class="font-mincho font-bold text-lg text-[#3d2412] drop-shadow-sm">お盆は空っぽです</p>
+                        <p class="text-xs sm:text-sm text-[#4a2e1b] mt-1 font-medium">上の「ガチャを回す！」ボタンを押して、今日の丸亀メニューを決めましょう！</p>
+                    </div>`;
+                badgeContainer.classList.add('hidden');
+                actionsEl.classList.add('hidden');
+                lockHintEl.classList.add('hidden');
+                return;
+            }
+
+            // 称号表示
+            const comboTitle = evaluateCombo(state.currentItems, total, state.budget);
+            titleEl.textContent = comboTitle;
+            badgeContainer.classList.remove('hidden');
+            actionsEl.classList.remove('hidden');
+
+            const hasAnyLock = state.currentItems.some(e => e.locked);
+            if (hasAnyLock) {
+                lockHintEl.classList.remove('hidden');
+            } else {
+                lockHintEl.classList.add('hidden');
+            }
+
+            // グリッド生成
+            const grid = document.createElement('div');
+            grid.className = 'w-full grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3';
+
+            state.currentItems.forEach((entry, idx) => {
+                const { uid, item, locked } = entry;
+                const card = document.createElement('div');
+                card.className = `washi-card rounded-xl p-3 flex items-center justify-between gap-2.5 relative ${locked ? 'ring-2 ring-[#c83228] bg-[#fff9f8]' : ''} ${animate && !locked ? 'opacity-0 animate-pop-in' : ''}`;
+                if (animate && !locked) {
+                    card.style.animationDelay = `${idx * 65}ms`;
+                }
+
+                card.innerHTML = `
+                    <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                        <div class="w-12 h-12 rounded-xl bg-[#f5efe4] border border-[#e3d6c1] flex items-center justify-center shrink-0 mt-0.5">
+                            ${getCategorySVG(item.category)}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-wrap items-center gap-1.5 mb-0.5">
+                                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${getCategoryBadgeStyle(item.category)}">${item.badge}</span>
+                                ${item.tag ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#c83228] text-white">${item.tag}</span>` : ''}
+                                <span class="font-mincho font-extrabold text-sm sm:text-base text-[#c83228]">${item.price}円</span>
+                            </div>
+                            <h3 class="font-bold text-sm sm:text-[15px] text-[#2b1a0e] leading-snug break-words">${item.name}</h3>
+                            <p class="text-[11px] text-[#7a6552] leading-relaxed mt-0.5 break-words">${item.desc}</p>
+                        </div>
+                    </div>
+                    <button type="button" data-uid="${uid}" class="lock-toggle-btn shrink-0 self-center p-2 rounded-lg border transition cursor-pointer ${locked ? 'bg-[#c83228] text-white border-[#c83228] shadow-xs' : 'bg-[#faf7f2] text-[#7a6552] border-[#dfd3be] hover:bg-amber-50'}" title="${locked ? '固定解除' : 'この商品を固定（キープ）'}">
+                        <span class="text-sm block leading-none">${locked ? '🔒' : '🔓'}</span>
+                        <span class="text-[9px] font-bold block mt-0.5">${locked ? 'キープ' : '固定'}</span>
+                    </button>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            container.innerHTML = '';
+            container.appendChild(grid);
+
+            // ロックボタンのイベント紐付け
+            container.querySelectorAll('.lock-toggle-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetUid = btn.getAttribute('data-uid');
+                    const target = state.currentItems.find(e => e.uid === targetUid);
+                    if (target) {
+                        target.locked = !target.locked;
+                        sfx.playClick(target.locked ? 680 : 440);
+                        renderTray(false);
+                    }
+                });
+            });
+        }
+
+        // 履歴追加＆描画
+        function addHistory(items, total, budget, title) {
+            state.history.unshift({
+                time: new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }),
+                items: items.map(e => e.item.name),
+                total,
+                budget,
+                title
+            });
+            if (state.history.length > 5) state.history.pop();
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const sec = document.getElementById('history-section');
+            const list = document.getElementById('history-list');
+            if (state.history.length === 0) {
+                sec.classList.add('hidden');
+                return;
+            }
+            sec.classList.remove('hidden');
+            list.innerHTML = state.history.map(h => `
+                <div class="bg-[#faf7f2] border border-[#e6dccb] rounded-xl p-2.5 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-[#8a7560]">${h.time}</span>
+                            <span class="font-bold text-[#c83228]">${h.title}</span>
+                        </div>
+                        <p class="text-[#3d2b1f] mt-0.5 leading-relaxed">${h.items.join(' ／ ')}</p>
+                    </div>
+                    <div class="shrink-0 font-mincho font-extrabold text-sm text-[#1c2a44] bg-white px-2.5 py-1 rounded-lg border border-[#dfd3be] self-start sm:self-center">
+                        計 ${h.total.toLocaleString()}円 <span class="text-[10px] font-sans font-normal text-[#7a6552]">/ ${h.budget.toLocaleString()}円</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ガチャ実行アニメーション＆処理
+        function spinGacha() {
+            if (state.isSpinning) return;
+            state.isSpinning = true;
+
+            const spinBtn = document.getElementById('spin-btn');
+            const btnIcon = document.getElementById('btn-icon');
+            const btnLabel = document.getElementById('btn-label');
+
+            spinBtn.disabled = true;
+            btnIcon.classList.add('animate-shake');
+            btnLabel.textContent = 'うどん茹で中＆天ぷら揚げ中...';
+
+            // スロット回転演出（7ステップ高速シャッフル）
+            let step = 0;
+            const maxSteps = 7;
+            const pitches = [330, 370, 415, 440, 494, 523, 587];
+
+            const interval = setInterval(() => {
+                sfx.playSlotTick(pitches[step % pitches.length]);
+                const tempItems = generateCombo();
+                state.currentItems = tempItems;
+                renderTray(false);
+
+                step++;
+                if (step >= maxSteps) {
+                    clearInterval(interval);
+                    // 最終結果確定
+                    const finalItems = generateCombo();
+                    state.currentItems = finalItems;
+                    renderTray(true);
+
+                    const total = finalItems.reduce((s, e) => s + e.item.price, 0);
+                    const isJackpot = (state.budget - total) === 0;
+                    sfx.playFanfare(isJackpot);
+
+                    const title = evaluateCombo(finalItems, total, state.budget);
+                    addHistory(finalItems, total, state.budget, title);
+
+                    spinBtn.disabled = false;
+                    btnIcon.classList.remove('animate-shake');
+                    btnLabel.textContent = 'ガチャを回す！';
+                    state.isSpinning = false;
+                }
+            }, 90);
+        }
+
+        // クリップボードへ結果コピー（execCommand使用）
+        function copyResultToClipboard() {
+            if (state.currentItems.length === 0) return;
+            sfx.playClick(600);
+            const total = state.currentItems.reduce((s, e) => s + e.item.price, 0);
+            const title = evaluateCombo(state.currentItems, total, state.budget);
+            const itemLines = state.currentItems.map(e => `・${e.item.name}（${e.item.price}円）`).join('\n');
+
+            const shareText = `【丸亀製麺 ${state.budget.toLocaleString()}円ガチャ】\n称号：${title}\n\n${itemLines}\n\n合計：${total.toLocaleString()}円（残金${(state.budget - total).toLocaleString()}円）\n#丸亀製麺1000円ガチャ`;
+
+            const textarea = document.createElement('textarea');
+            textarea.value = shareText;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('注文結果をクリップボードにコピーしました！', '📋');
+            } catch (err) {
+                showToast('コピーに失敗しました', '⚠️');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // お品書きモーダル生成
+        function buildMenuModal() {
+            const content = document.getElementById('modal-menu-content');
+            document.getElementById('total-menu-count').textContent = MENU_ITEMS.length;
+
+            const categories = [
+                { key: 'udon', label: '🍜 うどん（並・大・得・セット）' },
+                { key: 'tempura', label: '🍤 天ぷら' },
+                { key: 'rice', label: '🍙 おむすび・いなり・ごはん' },
+                { key: 'topping', label: '🌿 トッピング・その他' }
+            ];
+
+            content.innerHTML = categories.map(cat => {
+                const items = MENU_ITEMS.filter(m => m.category === cat.key);
+                return `
+                    <div>
+                        <h4 class="font-mincho font-bold text-base text-[#1c2a44] border-b border-[#dfd3be] pb-1 mb-2">${cat.label}（${items.length}品）</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                            ${items.map(item => `
+                                <div class="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-[#ebe2d3] gap-1.5">
+                                    <div class="flex items-center gap-1.5 min-w-0">
+                                        <span class="text-xs font-medium text-[#2b1a0e] truncate">${item.name}</span>
+                                        ${item.tag ? `<span class="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#fff0ef] text-[#c83228] border border-[#f3c2be]">${item.tag}</span>` : ''}
+                                    </div>
+                                    <span class="text-xs font-bold text-[#c83228] ml-1 shrink-0">${item.price}円</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 初期化とイベントリスナー登録
+        window.addEventListener('DOMContentLoaded', () => {
+            buildMenuModal();
+
+            // 予算選択ボタン
+            document.querySelectorAll('.budget-opt').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (state.isSpinning) return;
+                    document.querySelectorAll('.budget-opt').forEach(b => {
+                        b.classList.remove('active', 'border-2', 'border-[#c83228]', 'bg-[#fff3f2]', 'text-[#c83228]', 'shadow-sm');
+                        b.classList.add('border', 'border-[#d6c7b2]', 'bg-[#faf7f2]', 'text-[#5c4938]');
+                    });
+                    btn.classList.add('active', 'border-2', 'border-[#c83228]', 'bg-[#fff3f2]', 'text-[#c83228]', 'shadow-sm');
+                    btn.classList.remove('border', 'border-[#d6c7b2]', 'bg-[#faf7f2]', 'text-[#5c4938]');
+
+                    state.budget = Number(btn.getAttribute('data-budget'));
+                    document.getElementById('header-budget-label').textContent = `${state.budget.toLocaleString()}円`;
+                    sfx.playClick(540);
+                    renderTray(false);
+                });
+            });
+
+            // モード選択ボタン
+            document.querySelectorAll('.mode-opt').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (state.isSpinning) return;
+                    document.querySelectorAll('.mode-opt').forEach(b => {
+                        b.classList.remove('active', 'border-2', 'border-[#1c2a44]', 'bg-[#eef2f9]', 'text-[#1c2a44]', 'shadow-sm');
+                        b.classList.add('border', 'border-[#d6c7b2]', 'bg-[#faf7f2]', 'text-[#5c4938]');
+                    });
+                    btn.classList.add('active', 'border-2', 'border-[#1c2a44]', 'bg-[#eef2f9]', 'text-[#1c2a44]', 'shadow-sm');
+                    btn.classList.remove('border', 'border-[#d6c7b2]', 'bg-[#faf7f2]', 'text-[#5c4938]');
+
+                    state.mode = btn.getAttribute('data-mode');
+                    sfx.playClick(480);
+                });
+            });
+
+            // ガチャボタン
+            document.getElementById('spin-btn').addEventListener('click', spinGacha);
+
+            // ロック全解除
+            document.getElementById('clear-locks-btn').addEventListener('click', () => {
+                state.currentItems.forEach(e => e.locked = false);
+                sfx.playClick(400);
+                renderTray(false);
+                showToast('すべての固定を解除しました', '🔓');
+            });
+
+            // 結果コピー
+            document.getElementById('copy-result-btn').addEventListener('click', copyResultToClipboard);
+
+            // サウンド切替
+            document.getElementById('sound-toggle-btn').addEventListener('click', () => {
+                state.soundEnabled = !state.soundEnabled;
+                document.getElementById('sound-icon').textContent = state.soundEnabled ? '🔊' : '🔇';
+                document.getElementById('sound-text').textContent = state.soundEnabled ? '効果音 ON' : '効果音 OFF';
+                if (state.soundEnabled) sfx.playClick(580);
+            });
+
+            // お品書きモーダル開閉
+            const modal = document.getElementById('menu-modal');
+            document.getElementById('menu-list-btn').addEventListener('click', () => {
+                sfx.playClick(520);
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            });
+            const closeModal = () => {
+                sfx.playClick(420);
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
+            document.getElementById('close-modal-btn').addEventListener('click', closeModal);
+            document.getElementById('close-modal-footer-btn').addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+            // 履歴クリア
+            document.getElementById('clear-history-btn').addEventListener('click', () => {
+                sfx.playClick(400);
+                state.history = [];
+                renderHistory();
+            });
+        });
+    </script>
+</body>
+</html>
